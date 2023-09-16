@@ -28,10 +28,10 @@ Users should be able to:
 ### Screenshot
 
 ![](./images/preview-desktop-project.jpeg)
-[](./images/preview-mobile-01-project.jpeg)
-[](./images/preview-mobile-02-project.jpeg)
-[](./images/preview-mobile-03-project.jpeg)
-[](./images/preview-mobile-04-project.jpeg)
+![](./images/preview-mobile-01-project.jpeg)
+![](./images/preview-mobile-02-project.jpeg)
+![](./images/preview-mobile-03-project.jpeg)
+![](./images/preview-mobile-04-project.jpeg)
 
 ### Links
 
