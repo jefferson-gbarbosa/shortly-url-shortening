@@ -55,8 +55,12 @@ a{
     color: #fff;
     background-color: var(--cyan);
     letter-spacing: 1px;
-    padding: 1rem 1.5rem;
+    padding: 1.5rem 2.5rem;
     border-radius: 5rem;
+    transition: 0.5s;
+}
+.button:hover{
+    background-color: hsl(180, 64%, 79%);
 }
 /*=============== HEADER & NAV ===============*/
 header{
@@ -82,6 +86,10 @@ nav{
     font-size: 2rem;
     font-weight: 700;
     cursor: pointer;
+    transition: 0.5s;
+}
+.nav-link:hover{
+    color: var(--very-dark-violet);
 }
 .divide{
     height: 1px;
@@ -203,6 +211,9 @@ nav{
     border: none;
     cursor: pointer;
 }
+/* .btn-submit:hover{
+    background-color: hsl(180, 64%, 79%);
+} */
 /* LINKS SHORTED */
 .links{
     width: 100%;
@@ -211,6 +222,7 @@ nav{
 .link{
     background-color: #fff;
     border-radius: 0.4rem;
+    padding: 1rem;
 }
 .title-link-origin{
     margin-bottom: 0.8rem;
@@ -225,14 +237,18 @@ nav{
     margin-bottom: 1rem;
 }
 .btn-copy{
+    width: 100%;
     background-color: var(--cyan);
-    padding: 1rem;
+    padding: 2rem;
     font-weight: 700;
-    font-size: 1.1rem;
-    color: white;
+    font-size: 1.2rem;
+    color: #fff;
     border: none;
     border-radius: 5px;
-    width: 100%;
+    cursor: pointer;
+}
+.btn-copy:hover{
+    background-color: hsla(180, 98%, 50%, 0.329);
 }
 /*=============== ADVANCED ===============*/
 .advanced{
@@ -352,7 +368,7 @@ nav{
     color: var(--grayish-violet);
     transition: .5s;
 }
-.container-linksa:hover {
+.container-links a:hover {
     color: var(--cyan);
 }
 .container-social ul {
@@ -361,16 +377,21 @@ nav{
     gap: 30px;
     margin-bottom: 3rem;
 }
-.container-social img {
-    width: 3rem;
+.container-social .icon {
+    font-size: 3rem;
+    color: #fff;
     cursor: pointer;
+    transition: .5s;
+}
+.container-social .icon:hover{
+    color: var(--cyan);
 }
 /* ATRIBUTIONS */
 .attribution { 
     display: flex;
     flex-direction: column;
     color: #fff;
-    font-size: 1.2rem; 
+    font-size: 1.4rem; 
     text-align: center; 
 }
 .attribution a { 
@@ -495,13 +516,31 @@ nav{
     .link{
         display: flex;
         justify-content: space-between;
-        padding: 1rem;
+        align-items: center;
+        padding: 1.5rem;
     }
-    
+    .title-link-origin{
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    .title-link-shorted{
+        margin-bottom: 0;
+    }
+    .btn-copy{
+        font-weight: 700;
+        font-size: 1.4rem;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        width: 100%;
+        padding: 1.5rem 4rem;
+        margin-top: 0;
+    }
     .shorted{
         display: flex;
         align-items: center;
-        gap: 5.6rem;
+        gap: 1.6rem;
+        padding: 0;
     }
     /* Footer */
     .links-footer {
