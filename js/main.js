@@ -35,7 +35,8 @@ form.addEventListener("submit", async (event) =>{
         <div class="link">
             <p class="title-link-origin">${shortedResult.result.original_link}</p>
             <div class="shorted">
-            <p class="title-link-shorted">${shortedResult.result.short_link}</p>
+            <p class="title-link-shorted">${shortedResult.result.full_short_link
+            }</p>
             <button class="btn-copy">Copy</button>
             </div>
         </div>

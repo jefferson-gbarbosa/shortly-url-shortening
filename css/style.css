@@ -492,6 +492,17 @@ nav{
     .btn-submit{
         width: 30%;
     }
+    .link{
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem;
+    }
+    
+    .shorted{
+        display: flex;
+        align-items: center;
+        gap: 5.6rem;
+    }
     /* Footer */
     .links-footer {
         width: 100%;
