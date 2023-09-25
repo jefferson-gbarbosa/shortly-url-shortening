@@ -27,7 +27,6 @@ form.addEventListener("submit", async (event) =>{
 
     const inputUrlValue = input.value;
     const result = await fetch(`${API_URL}shorten?url=${inputUrlValue}`);
-    // const result = await fetch(`https://api.shrtco.de/v2/shorten?url=${inputUrlValue}`)
     const shortedResult = await result.json();
     console.log(shortedResult);
     linkContainer.innerHTML = 
