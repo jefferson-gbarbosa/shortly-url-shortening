@@ -7,6 +7,8 @@ const linkContainer = document.querySelector('.links');
 
 const API_URL = 'https://api.shrtco.de/v2/';
 
+let arrayStorage;
+
 /*===== MENU SHOW =====*/
 /* Validate if constant exists */
 if(navToggle){
@@ -26,19 +28,75 @@ form.addEventListener("submit", async (event) =>{
     event.preventDefault();
 
     const inputUrlValue = input.value;
-    const result = await fetch(`${API_URL}shorten?url=${inputUrlValue}`);
-    const shortedResult = await result.json();
-    console.log(shortedResult);
-    linkContainer.innerHTML = 
+    const response = await fetch(`${API_URL}shorten?url=${inputUrlValue}`);
+    const json = await response.json();
+    const originalLink = json.result.original_link;
+    const shortLink = json.result.full_short_link;
+
+    check(shortLink,originalLink);
+    createResult(shortLink, originalLink);
+    console.log(json);
+   
+})
+
+
+function createResult(shortLink, originalLink){
+    const div = document.createElement('div');
+    div.classList.add('link');
+    div.innerHTML = 
     `
-        <div class="link">
-            <p class="title-link-origin">${shortedResult.result.original_link}</p>
-            <div class="shorted">
-            <p class="title-link-shorted">${shortedResult.result.full_short_link
-            }</p>
-            <button class="btn-copy">Copy</button>
-            </div>
+        <p class="title-link-origin">${originalLink}</p>
+        <div class="shorted">
+        <p class="title-link-shorted">${shortLink}</p>
+        <button class="btn-copy button">Copy</button>
         </div>
     `;
-})
+    linkContainer.appendChild(div);
+
+    const copyButtonArray = document.querySelectorAll('.btn-copy');
+    copyButtonArray.forEach(button => {
+        button.addEventListener('click', copyUrl);
+    })
+}
+function copyUrl(){
+    const copyButton = document.querySelector('.btn-copy')
+    const shortUrl = copyButton.previousElementSibling.innerText;
+    console.log(shortUrl)
+
+    // Copia o URL curto para a área de transferência do navegador
+    navigator.clipboard.writeText(shortUrl);
+
+    // Altera o texto e o estilo do botão 'Copy' para indicar que a cópia foi realizada com sucesso
+    copyButton.innerText = 'Copied!';
+    copyButton.style.backgroundColor = 'hsl(260, 8%, 14%)';
+
+    // Define um atraso de 2 segundos antes de restaurar o texto e estilo original do botão
+    setTimeout(() => {
+        copyButton.innerText = 'Copy';
+        copyButton.style.backgroundColor = 'hsl(180, 66%, 49%)';
+    }, 2000)
+}
+
+// Retorna os dados do armazenamento local, convertidos de volta em um array.
+// Se nenhum dado for encontrado na Local Storage, retorna um array vazio.
+const getLocalStorage = () => JSON.parse(localStorage.getItem('links')) ?? [];
+// Armazena um array no armazenamento local, convertendo-o em uma string JSON.
+const setLocalStorage = () => localStorage.setItem('links', JSON.stringify(arrayStorage));
+
+// Função para enviar um objeto de links para o armazenamento local
+function sendLinksStorage(linksObject) {
+    arrayStorage = getLocalStorage();
+    arrayStorage.unshift(linksObject);
+    setLocalStorage();
+    console.log(arrayStorage)
+}
+
+function check(shortLink, originalLink){
+    const linksObject = {shortLink, originalLink};
+    // Atualiza o armazenamento local com o novo objeto de links
+    sendLinksStorage(linksObject);
+}
+
+
+
 
