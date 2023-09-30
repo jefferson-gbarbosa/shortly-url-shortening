@@ -2,8 +2,9 @@ const navMenu = document.getElementById('nav-menu');
 const navToggle = document.getElementById('nav-toggle');
 const navLink = document.querySelectorAll('.nav-link');
 const form = document.querySelector('form');
-const input = document.getElementById('input-field');
+const input = document.querySelector('.input-field');
 const linkContainer = document.querySelector('.links');
+const errorText = document.querySelector('.error-text');
 
 const API_URL = 'https://api.shrtco.de/v2/';
 
@@ -23,19 +24,28 @@ function linkAction(){
     navMenu.classList.remove('show-menu');
 }
 navLink.forEach(n => n.addEventListener('click',linkAction));
-
+//SUBMIT FORM
 form.addEventListener("submit", async (event) =>{
     event.preventDefault();
 
     const inputUrlValue = input.value;
-    const response = await fetch(`${API_URL}shorten?url=${inputUrlValue}`);
-    const json = await response.json();
-    const originalLink = json.result.original_link;
-    const shortLink = json.result.full_short_link;
+    if(inputUrlValue === ""){
+        input.classList.add('error');
+        errorText.style.display = "block";
 
-    check(shortLink,originalLink);
-    createResult(shortLink, originalLink);
-    console.log(json);
+    }else{
+        input.classList.remove('error');
+        errorText.style.display = "none";
+
+        const response = await fetch(`${API_URL}shorten?url=${inputUrlValue}`);
+        const json = await response.json();
+        const originalLink = json.result.original_link;
+        const shortLink = json.result.full_short_link;
+
+        check(shortLink,originalLink);
+        createResult(shortLink, originalLink);
+        console.log(json);
+    }
    
 })
 

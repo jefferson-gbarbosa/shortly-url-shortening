@@ -176,6 +176,11 @@ nav{
     flex-direction: column;
     gap: 2rem;
 }
+.field{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
 .input-field{
     width: 100%;
     padding:2rem; 
@@ -186,17 +191,18 @@ nav{
     border: none;
 }
 /* ERROR */
-/* .input-field.error{
-    border: 2px solid red;
+.input-field.error{
+    border: 2px solid var(--red);
 }
 .input-field.error::placeholder{
-    color: red;
-} */
-/* .error-text{
-    color: red;
-    font-size: 0.8rem;
+    color: var(--red);
+}
+.error-text{
+    display: none;
+    color: var(--red);
+    font-size: 1.4rem;
     text-align: left;
-} */
+} 
 .btn-submit{
     width: 100%;
     color: #fff;
@@ -508,9 +514,16 @@ nav{
     }
     .form{
         flex-direction: row;
+        align-items: flex-start;
     }
+    .field{
+        width: 75%;
+    }
+    .error-text{
+        font-size: 1.8rem; 
+    } 
     .btn-submit{
-        width: 30%;
+        width: 25%;
     }
     .link{
         display: flex;
