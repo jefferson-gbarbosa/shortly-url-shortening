@@ -9,6 +9,7 @@ const errorText = document.querySelector('.error-text');
 const API_URL = 'https://api.shrtco.de/v2/';
 
 let arrayStorage;
+const resultsArray = [];
 
 /*===== MENU SHOW =====*/
 /* Validate if constant exists */
@@ -24,6 +25,9 @@ function linkAction(){
     navMenu.classList.remove('show-menu');
 }
 navLink.forEach(n => n.addEventListener('click',linkAction));
+// Chama a função para verificar o armazenamento local assim que a página é carregada
+window.addEventListener('load', getLinksStorage);
+
 //SUBMIT FORM
 form.addEventListener("submit", async (event) =>{
     event.preventDefault();
@@ -42,7 +46,8 @@ form.addEventListener("submit", async (event) =>{
         const originalLink = json.result.original_link;
         const shortLink = json.result.full_short_link;
 
-        check(shortLink,originalLink);
+        // check(shortLink,originalLink);
+        checkNumbersResults(shortLink,originalLink);
         createResult(shortLink, originalLink);
         console.log(json);
     }
@@ -105,6 +110,42 @@ function check(shortLink, originalLink){
     const linksObject = {shortLink, originalLink};
     // Atualiza o armazenamento local com o novo objeto de links
     sendLinksStorage(linksObject);
+}
+function getLinksStorage() {
+    if(window.localStorage.length) {
+      arrayStorage = getLocalStorage();
+      // Itera sobre cada objeto de links no array
+      arrayStorage.forEach((linksObject) => {
+        // Extrai as propriedades 'shortLink' e 'originalLink' do objeto
+        const { shortLink, originalLink } = linksObject;
+        createResult(shortLink, originalLink);
+      })
+    }
+  }
+  // Função para verificar a quantidade de resultados existentes e executar a ação apropriada.
+function checkNumbersResults(shortLink, originalLink) {
+    if (resultsArray.length === 3) {
+      // Se já existem 3 resultados, abre o modal para o usuário
+      // escolher qual deles deve ser substituído pelo novo resultado
+    //   replaceResult();
+       updateResults();
+    } else {
+      // Cria um novo resultado
+      createResult(shortLink, originalLink);
+      const linksObject = {shortLink, originalLink};
+      // Atualiza o armazenamento local com o novo objeto de links
+      sendLinksStorage(linksObject);
+    }
+  }
+
+  // Função para controlar o estilo dos elementos do modal
+function openModal(open) {
+    if(open) {
+      containerModal.classList.add('active');
+    }
+    else {
+      containerModal.classList.remove('active');
+    }
 }
 
 
