@@ -1,15 +1,18 @@
 const navMenu = document.getElementById('nav-menu');
 const navToggle = document.getElementById('nav-toggle');
 const navLink = document.querySelectorAll('.nav-link');
-const form = document.querySelector('form');
+const modal = document.querySelector('.modal')
 const input = document.querySelector('.input-field');
 const linkContainer = document.querySelector('.links');
+const modalContent = document.querySelector('.modal-content');
+const btnSubmit = document.querySelector('.btn-submit')
 const errorText = document.querySelector('.error-text');
+const closeModal = document.querySelector('.close-modal');
 
-const API_URL = 'https://api.shrtco.de/v2/';
-
-let arrayStorage;
+// const API_URL = 'https://api.shrtco.de/v2/';
+// const API_URL = '4ae1a68b796d4986acafc09f191046f2'
 const resultsArray = [];
+let arrayStorage;
 
 /*===== MENU SHOW =====*/
 /* Validate if constant exists */
@@ -25,35 +28,6 @@ function linkAction(){
     navMenu.classList.remove('show-menu');
 }
 navLink.forEach(n => n.addEventListener('click',linkAction));
-// Chama a função para verificar o armazenamento local assim que a página é carregada
-window.addEventListener('load', getLinksStorage);
-
-//SUBMIT FORM
-form.addEventListener("submit", async (event) =>{
-    event.preventDefault();
-
-    const inputUrlValue = input.value;
-    if(inputUrlValue === ""){
-        input.classList.add('error');
-        errorText.style.display = "block";
-
-    }else{
-        input.classList.remove('error');
-        errorText.style.display = "none";
-
-        const response = await fetch(`${API_URL}shorten?url=${inputUrlValue}`);
-        const json = await response.json();
-        const originalLink = json.result.original_link;
-        const shortLink = json.result.full_short_link;
-
-        // check(shortLink,originalLink);
-        checkNumbersResults(shortLink,originalLink);
-        createResult(shortLink, originalLink);
-        console.log(json);
-    }
-   
-})
-
 
 function createResult(shortLink, originalLink){
     const div = document.createElement('div');
@@ -67,12 +41,14 @@ function createResult(shortLink, originalLink){
         </div>
     `;
     linkContainer.appendChild(div);
-
+    // Adiciona o link original ao início do array 'resultsArray'
+    resultsArray.unshift(originalLink);
     const copyButtonArray = document.querySelectorAll('.btn-copy');
     copyButtonArray.forEach(button => {
         button.addEventListener('click', copyUrl);
     })
 }
+
 function copyUrl(){
     const copyButton = document.querySelector('.btn-copy')
     const shortUrl = copyButton.previousElementSibling.innerText;
@@ -103,14 +79,8 @@ function sendLinksStorage(linksObject) {
     arrayStorage = getLocalStorage();
     arrayStorage.unshift(linksObject);
     setLocalStorage();
-    console.log(arrayStorage)
 }
 
-function check(shortLink, originalLink){
-    const linksObject = {shortLink, originalLink};
-    // Atualiza o armazenamento local com o novo objeto de links
-    sendLinksStorage(linksObject);
-}
 function getLinksStorage() {
     if(window.localStorage.length) {
       arrayStorage = getLocalStorage();
@@ -122,13 +92,34 @@ function getLinksStorage() {
       })
     }
   }
-  // Função para verificar a quantidade de resultados existentes e executar a ação apropriada.
+function createResultModal(){
+  modal.classList.add('active');
+  resultsArray.forEach((link) => {
+    // Define o texto de cada botão de link, presente no modal, com o link original correspondente
+    const div = document.createElement('div');
+    div.classList.add('link');
+    div.classList.add('modal-links');
+    div.innerHTML = 
+    `
+        <p class="title-link-origin">${link}</p>
+        <div class="shorted">
+          <button class="btn-modal button">
+           <i class="ri-delete-bin-5-line .icon-modal"></i>
+          </button>
+        </div>
+    `;
+    modalContent.appendChild(div)
+  });
+ 
+}
+function closeModalResults(){
+  modal.classList.remove('active');
+}
+// Função para verificar a quantidade de resultados existentes e executar a ação apropriada.
 function checkNumbersResults(shortLink, originalLink) {
     if (resultsArray.length === 3) {
       // Se já existem 3 resultados, abre o modal para o usuário
-      // escolher qual deles deve ser substituído pelo novo resultado
-    //   replaceResult();
-       updateResults();
+      createResultModal()
     } else {
       // Cria um novo resultado
       createResult(shortLink, originalLink);
@@ -137,16 +128,54 @@ function checkNumbersResults(shortLink, originalLink) {
       sendLinksStorage(linksObject);
     }
   }
+async function urlShortener(event) {
+    event.preventDefault();
+    const inputUrlValue = input.value;
+    if(inputUrlValue === ""){
+        input.classList.add('error');
+        errorText.style.display = "block";
+    }else{
+        input.classList.remove('error');
+        errorText.style.display = "none";
 
-  // Função para controlar o estilo dos elementos do modal
-function openModal(open) {
-    if(open) {
-      containerModal.classList.add('active');
-    }
-    else {
-      containerModal.classList.remove('active');
+        // const response = await fetch(`${API_URL}shorten?url=${inputUrlValue}`);
+        // const json = await response.json();
+        // const originalLink = json.result.original_link;
+        // const shortLink = json.result.full_short_link;
+         //headers
+        let headers = {
+              "Content-Type": "application/json",
+              "apiKey": "4ae1a68b796d4986acafc09f191046f2" //colocar api key do rebrand.ly
+        }
+
+          //dados
+        let linkRequest = {
+              destination: inputUrlValue,
+              domain: { fullName: "rebrand.ly" }
+        }
+
+        // const response = await fetch(`${API_URL}shorten?url=${inputUrlValue}`);
+        const response = await fetch("https://api.rebrandly.com/v1/links", {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(linkRequest)
+        });
+        const json = await response.json();
+        console.log(json)
+        // const originalLink = json.result.original_link;
+        // const shortLink = json.result.full_short_link;
+
+        const originalLink = json.destination;
+        const shortLink = json.shortUrl;
+
+        checkNumbersResults(shortLink,originalLink);
     }
 }
+closeModal.addEventListener("click",closeModalResults)
+//SUBMIT FORM
+btnSubmit.addEventListener("click", urlShortener)
+// Chama a função para verificar o armazenamento local assim que a página é carregada
+window.addEventListener('load', getLinksStorage);
 
 
 
