@@ -7,7 +7,7 @@ const linkContainer = document.querySelector('.links');
 const modalContent = document.querySelector('.modal-content');
 const btnSubmit = document.querySelector('.btn-submit')
 const errorText = document.querySelector('.error-text');
-const closeModal = document.querySelector('.close-modal');
+const btnModal = document.querySelector('.btn-modal');
 
 // const API_URL = 'https://api.shrtco.de/v2/';
 // const API_URL = '4ae1a68b796d4986acafc09f191046f2'
@@ -81,6 +81,14 @@ function sendLinksStorage(linksObject) {
     setLocalStorage();
 }
 
+// Função para excluir links do armazenamento local
+function deleteLinksStorage(index) {
+  arrayStorage = getLocalStorage();
+  arrayStorage.splice(index, 1);
+  setLocalStorage();
+  // console.log(arrayStorage)
+}
+
 function getLinksStorage() {
     if(window.localStorage.length) {
       arrayStorage = getLocalStorage();
@@ -91,29 +99,28 @@ function getLinksStorage() {
         createResult(shortLink, originalLink);
       })
     }
-  }
+}
+
 function createResultModal(){
   modal.classList.add('active');
-  resultsArray.forEach((link) => {
-    // Define o texto de cada botão de link, presente no modal, com o link original correspondente
-    const div = document.createElement('div');
-    div.classList.add('link');
-    div.classList.add('modal-links');
-    div.innerHTML = 
-    `
-        <p class="title-link-origin">${link}</p>
-        <div class="shorted">
-          <button class="btn-modal button">
-           <i class="ri-delete-bin-5-line .icon-modal"></i>
-          </button>
-        </div>
-    `;
-    modalContent.appendChild(div)
-  });
- 
+  btnModal.innerHTML = '<i class="ri-delete-bin-5-line"></i>'; 
 }
+function removeElement(){ 
+  const removeResult = document.querySelectorAll('.modal-links');
+  resultsArray.splice(removeResult, 1);
+  deleteLinksStorage(removeResult);
+  let no = linkContainer.querySelector(".link");
+  if(no.parentNode){
+      no.parentNode.removeChild(no);
+  }
+  btnModal.innerHTML = '<i class="ri-check-fill"></i>';
+  closeModalResults();
+}
+ 
 function closeModalResults(){
-  modal.classList.remove('active');
+  setTimeout(() => {
+    modal.classList.remove('active');
+  }, 2000);
 }
 // Função para verificar a quantidade de resultados existentes e executar a ação apropriada.
 function checkNumbersResults(shortLink, originalLink) {
@@ -171,7 +178,7 @@ async function urlShortener(event) {
         checkNumbersResults(shortLink,originalLink);
     }
 }
-closeModal.addEventListener("click",closeModalResults)
+btnModal.addEventListener("click",removeElement)
 //SUBMIT FORM
 btnSubmit.addEventListener("click", urlShortener)
 // Chama a função para verificar o armazenamento local assim que a página é carregada
