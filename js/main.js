@@ -14,21 +14,23 @@ const btnModal = document.querySelector('.btn-modal');
 const resultsArray = [];
 let arrayStorage;
 
-/*===== MENU SHOW =====*/
-/* Validate if constant exists */
+// FUNCTIONS
+
+//MENU SHOW//
+//validate if constant exists //
 if(navToggle){
     navToggle.addEventListener('click', () =>{
         navMenu.classList.toggle('show-menu');
     })
 }
 // REMOVE MENU MOBILE
-// When we click on each nav-link,we remove the show-menu
+// when we click on each nav-link,we remove the show-menu
 function linkAction(){
     const navMenu = document.getElementById('nav-menu');
     navMenu.classList.remove('show-menu');
 }
 navLink.forEach(n => n.addEventListener('click',linkAction));
-
+// create results on screen
 function createResult(shortLink, originalLink){
     const div = document.createElement('div');
     div.classList.add('link');
@@ -41,70 +43,61 @@ function createResult(shortLink, originalLink){
         </div>
     `;
     linkContainer.appendChild(div);
-    // Adiciona o link original ao início do array 'resultsArray'
     resultsArray.unshift(originalLink);
     const copyButtonArray = document.querySelectorAll('.btn-copy');
     copyButtonArray.forEach(button => {
         button.addEventListener('click', copyUrl);
     })
 }
-
+// copy the shortened url
 function copyUrl(){
-    const copyButton = document.querySelector('.btn-copy')
-    const shortUrl = copyButton.previousElementSibling.innerText;
-    console.log(shortUrl)
+  const copyButton = document.querySelector('.btn-copy')
+  const shortUrl = copyButton.previousElementSibling.innerText;
+  navigator.clipboard.writeText(shortUrl);
 
-    // Copia o URL curto para a área de transferência do navegador
-    navigator.clipboard.writeText(shortUrl);
+  copyButton.innerText = 'Copied!';
+  copyButton.style.backgroundColor = 'hsl(260, 8%, 14%)';
 
-    // Altera o texto e o estilo do botão 'Copy' para indicar que a cópia foi realizada com sucesso
-    copyButton.innerText = 'Copied!';
-    copyButton.style.backgroundColor = 'hsl(260, 8%, 14%)';
-
-    // Define um atraso de 2 segundos antes de restaurar o texto e estilo original do botão
-    setTimeout(() => {
-        copyButton.innerText = 'Copy';
-        copyButton.style.backgroundColor = 'hsl(180, 66%, 49%)';
-    }, 2000)
+  setTimeout(() => {
+      copyButton.innerText = 'Copy';
+      copyButton.style.backgroundColor = 'hsl(180, 66%, 49%)';
+  }, 2000)
 }
 
-// Retorna os dados do armazenamento local, convertidos de volta em um array.
-// Se nenhum dado for encontrado na Local Storage, retorna um array vazio.
+// returns data from local storage, converted back to an array.
+// if no data is found in Local Storage, returns an empty array.
 const getLocalStorage = () => JSON.parse(localStorage.getItem('links')) ?? [];
-// Armazena um array no armazenamento local, convertendo-o em uma string JSON.
+// stores an array in local storage, converting it to a JSON string.
 const setLocalStorage = () => localStorage.setItem('links', JSON.stringify(arrayStorage));
 
-// Função para enviar um objeto de links para o armazenamento local
+// function to send a links object to local storage
 function sendLinksStorage(linksObject) {
     arrayStorage = getLocalStorage();
     arrayStorage.unshift(linksObject);
     setLocalStorage();
 }
-
-// Função para excluir links do armazenamento local
+// function to delete links from local storage
 function deleteLinksStorage(index) {
   arrayStorage = getLocalStorage();
   arrayStorage.splice(index, 1);
   setLocalStorage();
-  // console.log(arrayStorage)
 }
-
+// function to get links from local storage
 function getLinksStorage() {
     if(window.localStorage.length) {
       arrayStorage = getLocalStorage();
-      // Itera sobre cada objeto de links no array
       arrayStorage.forEach((linksObject) => {
-        // Extrai as propriedades 'shortLink' e 'originalLink' do objeto
         const { shortLink, originalLink } = linksObject;
         createResult(shortLink, originalLink);
       })
     }
 }
-
+// function create modal
 function createResultModal(){
   modal.classList.add('active');
   btnModal.innerHTML = '<i class="ri-delete-bin-5-line"></i>'; 
 }
+// remove element modal
 function removeElement(){ 
   const removeResult = document.querySelectorAll('.modal-links');
   resultsArray.splice(removeResult, 1);
@@ -116,25 +109,23 @@ function removeElement(){
   btnModal.innerHTML = '<i class="ri-check-fill"></i>';
   closeModalResults();
 }
- 
+// function close modal
 function closeModalResults(){
   setTimeout(() => {
     modal.classList.remove('active');
   }, 2000);
 }
-// Função para verificar a quantidade de resultados existentes e executar a ação apropriada.
+// function to check the number of existing results and take appropriate action.
 function checkNumbersResults(shortLink, originalLink) {
     if (resultsArray.length === 3) {
-      // Se já existem 3 resultados, abre o modal para o usuário
       createResultModal()
     } else {
-      // Cria um novo resultado
       createResult(shortLink, originalLink);
       const linksObject = {shortLink, originalLink};
-      // Atualiza o armazenamento local com o novo objeto de links
       sendLinksStorage(linksObject);
     }
-  }
+}
+// function shortener url
 async function urlShortener(event) {
     event.preventDefault();
     const inputUrlValue = input.value;
@@ -178,10 +169,14 @@ async function urlShortener(event) {
         checkNumbersResults(shortLink,originalLink);
     }
 }
+
+//EVENTS
+
+// remove element to modal
 btnModal.addEventListener("click",removeElement)
-//SUBMIT FORM
+//submit form
 btnSubmit.addEventListener("click", urlShortener)
-// Chama a função para verificar o armazenamento local assim que a página é carregada
+// call the function to check local storage as soon as the page is loaded
 window.addEventListener('load', getLinksStorage);
 
 
