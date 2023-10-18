@@ -9,8 +9,6 @@ const btnSubmit = document.querySelector('.btn-submit')
 const errorText = document.querySelector('.error-text');
 const btnModal = document.querySelector('.btn-modal');
 
-// const API_URL = 'https://api.shrtco.de/v2/';
-// const API_URL = '4ae1a68b796d4986acafc09f191046f2'
 const resultsArray = [];
 let arrayStorage;
 
@@ -38,20 +36,22 @@ function createResult(shortLink, originalLink){
     `
         <p class="title-link-origin">${originalLink}</p>
         <div class="shorted">
-        <p class="title-link-shorted">${shortLink}</p>
+        <p class="title-link-shorted">gotiny.cc/${shortLink}</p>
         <button class="btn-copy button">Copy</button>
         </div>
     `;
     linkContainer.appendChild(div);
     resultsArray.unshift(originalLink);
+
     const copyButtonArray = document.querySelectorAll('.btn-copy');
     copyButtonArray.forEach(button => {
         button.addEventListener('click', copyUrl);
     })
+    console.log(linkContainer)
 }
 // copy the shortened url
-function copyUrl(){
-  const copyButton = document.querySelector('.btn-copy')
+function copyUrl({ target }){
+  const copyButton = target
   const shortUrl = copyButton.previousElementSibling.innerText;
   navigator.clipboard.writeText(shortUrl);
 
@@ -62,6 +62,7 @@ function copyUrl(){
       copyButton.innerText = 'Copy';
       copyButton.style.backgroundColor = 'hsl(180, 66%, 49%)';
   }, 2000)
+
 }
 
 // returns data from local storage, converted back to an array.
@@ -136,35 +137,15 @@ async function urlShortener(event) {
         input.classList.remove('error');
         errorText.style.display = "none";
 
-        // const response = await fetch(`${API_URL}shorten?url=${inputUrlValue}`);
-        // const json = await response.json();
-        // const originalLink = json.result.original_link;
-        // const shortLink = json.result.full_short_link;
-         //headers
-        let headers = {
-              "Content-Type": "application/json",
-              "apiKey": "4ae1a68b796d4986acafc09f191046f2" //colocar api key do rebrand.ly
-        }
-
-          //dados
-        let linkRequest = {
-              destination: inputUrlValue,
-              domain: { fullName: "rebrand.ly" }
-        }
-
-        // const response = await fetch(`${API_URL}shorten?url=${inputUrlValue}`);
-        const response = await fetch("https://api.rebrandly.com/v1/links", {
+        const response = await fetch("https://gotiny.cc/api", {
           method: "POST",
-          headers: headers,
-          body: JSON.stringify(linkRequest)
-        });
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input: inputUrlValue }),
+        })
         const json = await response.json();
-        console.log(json)
-        // const originalLink = json.result.original_link;
-        // const shortLink = json.result.full_short_link;
-
-        const originalLink = json.destination;
-        const shortLink = json.shortUrl;
+    
+        const originalLink = json[0].long;
+        const shortLink = json[0].code;
 
         checkNumbersResults(shortLink,originalLink);
     }
