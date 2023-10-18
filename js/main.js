@@ -47,7 +47,6 @@ function createResult(shortLink, originalLink){
     copyButtonArray.forEach(button => {
         button.addEventListener('click', copyUrl);
     })
-    console.log(linkContainer)
 }
 // copy the shortened url
 function copyUrl({ target }){
