@@ -36,7 +36,7 @@ function createResult(shortLink, originalLink){
     `
         <p class="title-link-origin">${originalLink}</p>
         <div class="shorted">
-        <p class="title-link-shorted">gotiny.cc/${shortLink}</p>
+        <p class="title-link-shorted">${shortLink}</p>
         <button class="btn-copy button">Copy</button>
         </div>
     `;
@@ -135,17 +135,20 @@ async function urlShortener(event) {
     }else{
         input.classList.remove('error');
         errorText.style.display = "none";
-
-        const response = await fetch("https://gotiny.cc/api", {
+        // http://127.0.0.1:8000/url
+        // https://url-shortener-api-gb9s.onrender.com/url
+        const response = await fetch("https://url-shortener-api-gb9s.onrender.com/url", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input: inputUrlValue }),
+          body: JSON.stringify({ target_url: inputUrlValue }),
         })
-        const json = await response.json();
-    
-        const originalLink = json[0].long;
-        const shortLink = json[0].code;
 
+        const json = await response.json();
+        console.log(json)
+        const originalLink = json.target_url;
+        const shortLink = json.url;
+        
+    
         checkNumbersResults(shortLink,originalLink);
     }
 }
