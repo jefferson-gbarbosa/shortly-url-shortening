@@ -1,19 +1,15 @@
 const navMenu = document.getElementById('nav-menu');
 const navToggle = document.getElementById('nav-toggle');
 const navLink = document.querySelectorAll('.nav-link');
-const modal = document.querySelector('.modal')
+const modal = document.querySelector('.modal');
+const modalContainer = document.querySelector('.modal-container');
 const input = document.querySelector('.input-field');
 const linkContainer = document.querySelector('.links');
-const modalContent = document.querySelector('.modal-content');
 const btnSubmit = document.querySelector('.btn-submit')
 const errorText = document.querySelector('.error-text');
 const btnModal = document.querySelector('.btn-modal');
 
-const resultsArray = [];
-let arrayStorage;
-
 // FUNCTIONS
-
 //MENU SHOW//
 //validate if constant exists //
 if(navToggle){
@@ -29,29 +25,96 @@ function linkAction(){
 }
 navLink.forEach(n => n.addEventListener('click',linkAction));
 // create results on screen
-function createResult(shortLink, originalLink){
+async function fetchData() {
+  try {
+  
+      const response = await fetch("https://url-shortener-xve9.onrender.com/urls"); 
+      
+      if (!response.status) {
+          throw new Error('Network response was not ok');
+      }
+      const res = await response.json();
+     
+      const data = res.splice(0,3)
+      console.log(data)
+      createResult(data)   
+  } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+  }
+}
+
+// function shortener url
+async function urlShortener(event) {
+  event.preventDefault();
+
+  const inputUrlValue = input.value;
+  if(inputUrlValue === ""){
+      input.classList.add('error');
+      errorText.style.display = "block";
+  }else{
+      input.classList.remove('error');
+      errorText.style.display = "none";
+    
+      const response = await fetch("https://url-shortener-xve9.onrender.com/url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target_url: inputUrlValue }),
+      })
+
+      const data = await response.json();
+    
+      checkNumbersResults([data]);
+      closeModalResults();
+  }
+}
+
+async function deleteItem(key_url) {
+  try {
+    const response = await fetch(`https://url-shortener-xve9.onrender.com/url/${key_url}`, {
+      method: 'DELETE', 
+    });
+    if (response.status === 204) {
+      console.log('Item excluído com sucesso, sem conteúdo adicional.');
+    } else {
+      console.log('Resposta inesperada:', response.status);
+    }
+  } catch (error) {
+    console.error('Erro ao excluir item:', error);
+  }
+}
+
+function createResult(data){
+  for (let index = 0; index < data.length; index++) {
+    const element = data[index];
+ 
     const div = document.createElement('div');
     div.classList.add('link');
     div.innerHTML = 
     `
-        <p class="title-link-origin">${originalLink}</p>
+        <p class="title-link-origin">${element.target_url}</p>
         <div class="shorted">
-        <p class="title-link-shorted">${shortLink}</p>
+        <p class="title-link-shorted">${element.url}</p>
         <button class="btn-copy button">Copy</button>
+        <button class="btn-delete button">Delete</button>
         </div>
     `;
     linkContainer.appendChild(div);
-    resultsArray.unshift(originalLink);
-
+  
     const copyButtonArray = document.querySelectorAll('.btn-copy');
     copyButtonArray.forEach(button => {
         button.addEventListener('click', copyUrl);
     })
+    const deleteButtonArray = document.querySelectorAll('.btn-delete');
+    deleteButtonArray.forEach(button => {
+      button.addEventListener('click', removeElement)
+    })
+  } 
 }
 // copy the shortened url
 function copyUrl({ target }){
   const copyButton = target
   const shortUrl = copyButton.previousElementSibling.innerText;
+
   navigator.clipboard.writeText(shortUrl);
 
   copyButton.innerText = 'Copied!';
@@ -61,54 +124,26 @@ function copyUrl({ target }){
       copyButton.innerText = 'Copy';
       copyButton.style.backgroundColor = 'hsl(180, 66%, 49%)';
   }, 2000)
-
 }
 
-// returns data from local storage, converted back to an array.
-// if no data is found in Local Storage, returns an empty array.
-const getLocalStorage = () => JSON.parse(localStorage.getItem('links')) ?? [];
-// stores an array in local storage, converting it to a JSON string.
-const setLocalStorage = () => localStorage.setItem('links', JSON.stringify(arrayStorage));
-
-// function to send a links object to local storage
-function sendLinksStorage(linksObject) {
-    arrayStorage = getLocalStorage();
-    arrayStorage.unshift(linksObject);
-    setLocalStorage();
-}
-// function to delete links from local storage
-function deleteLinksStorage(index) {
-  arrayStorage = getLocalStorage();
-  arrayStorage.splice(index, 1);
-  setLocalStorage();
-}
-// function to get links from local storage
-function getLinksStorage() {
-    if(window.localStorage.length) {
-      arrayStorage = getLocalStorage();
-      arrayStorage.forEach((linksObject) => {
-        const { shortLink, originalLink } = linksObject;
-        createResult(shortLink, originalLink);
-      })
-    }
-}
-// function create modal
-function createResultModal(){
-  modal.classList.add('active');
-  btnModal.innerHTML = '<i class="ri-delete-bin-5-line"></i>'; 
-}
 // remove element modal
 function removeElement(){ 
-  const removeResult = document.querySelectorAll('.modal-links');
-  resultsArray.splice(removeResult, 1);
-  deleteLinksStorage(removeResult);
   let no = linkContainer.querySelector(".link");
+  let shorted = no.querySelector('.shorted')
+  let txtFirstChild = shorted.firstElementChild.textContent
+
+  deleteItem(txtFirstChild)
+  
   if(no.parentNode){
       no.parentNode.removeChild(no);
   }
-  btnModal.innerHTML = '<i class="ri-check-fill"></i>';
-  closeModalResults();
 }
+
+// function create modal
+function createResultModal(){
+  modal.classList.add('active');
+}
+
 // function close modal
 function closeModalResults(){
   setTimeout(() => {
@@ -116,51 +151,20 @@ function closeModalResults(){
   }, 2000);
 }
 // function to check the number of existing results and take appropriate action.
-function checkNumbersResults(shortLink, originalLink) {
-    if (resultsArray.length === 3) {
-      createResultModal()
-    } else {
-      createResult(shortLink, originalLink);
-      const linksObject = {shortLink, originalLink};
-      sendLinksStorage(linksObject);
-    }
+function checkNumbersResults(data) {
+  if (linkContainer.children.length === 3) {
+    createResultModal()
+  } else {
+    createResult(data);
+  }
 }
-// function shortener url
-async function urlShortener(event) {
-    event.preventDefault();
-    const inputUrlValue = input.value;
-    if(inputUrlValue === ""){
-        input.classList.add('error');
-        errorText.style.display = "block";
-    }else{
-        input.classList.remove('error');
-        errorText.style.display = "none";
-        // http://127.0.0.1:8000/url
-        // https://url-shortener-api-gb9s.onrender.com/url
-        const response = await fetch("https://url-shortener-api-gb9s.onrender.com/url", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ target_url: inputUrlValue }),
-        })
-
-        const json = await response.json();
-        console.log(json)
-        const originalLink = json.target_url;
-        const shortLink = json.url;
-        
-    
-        checkNumbersResults(shortLink,originalLink);
-    }
-}
-
 //EVENTS
-
-// remove element to modal
-btnModal.addEventListener("click",removeElement)
 //submit form
 btnSubmit.addEventListener("click", urlShortener)
 // call the function to check local storage as soon as the page is loaded
-window.addEventListener('load', getLinksStorage);
+window.addEventListener('load', fetchData);
+
+
 
 
 

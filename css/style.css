@@ -298,7 +298,8 @@ nav{
     color: var(--cyan);
     margin-bottom: 1rem;
 }
-.btn-copy{
+.btn-copy,
+.btn-delete{
     width: 100%;
     background-color: var(--cyan);
     padding: 2rem;
@@ -308,6 +309,10 @@ nav{
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+.btn-delete{
+    color: black;
+    margin-top: 1rem
 }
 .btn-copy:hover{
     background-color: hsla(180, 98%, 50%, 0.329);
@@ -595,7 +600,8 @@ nav{
     .title-link-shorted{
         margin-bottom: 0;
     }
-    .btn-copy{
+    .btn-copy,
+    .btn-delete{
         font-weight: 700;
         font-size: 1.4rem;
         color: #fff;
@@ -604,6 +610,9 @@ nav{
         width: 100%;
         padding: 1.5rem 4rem;
         margin-top: 0;
+    }
+    .btn-delete{
+        color: black;
     }
     .shorted{
         display: flex;
