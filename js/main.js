@@ -93,7 +93,7 @@ function createResult(data){
     `
         <p class="title-link-origin">${element.target_url}</p>
         <div class="shorted">
-        <p class="title-link-shorted">${element.url}</p>
+        <p class="title-link-shorted">https://url-shortener-xve9.onrender.com/${element.url}</p>
         <button class="btn-copy button">Copy</button>
         <button class="btn-delete button">Delete</button>
         </div>
